@@ -100,7 +100,7 @@ function addListEntry(name, isFragment) {
   listEntryInput.addEventListener("blur", function () {
     listEntry.classList.remove("edit");
     if (!name) {
-      if (listEntryInput.value != "") {
+      if (listEntryInput.value.trim() != "") {
         addListEntry(listEntryInput.value, isFragment);
         if (isFragment) {
           unwantedNGrams.push(listEntryInput.value);
@@ -113,7 +113,7 @@ function addListEntry(name, isFragment) {
       listEntryInput.focus();
       return;
     } else {
-      if (listEntryInput.value == "") {
+      if (listEntryInput.value.trim() == "") {
         if (isFragment) {
           unwantedNGrams.splice(
             unwantedNGrams.indexOf(listEntryName.textContent),
@@ -169,8 +169,14 @@ browser.storage.sync.get(
     isStealthMode: false,
   },
   (response) => {
-    unwantedWords = response.unwantedWords;
-    unwantedNGrams = response.unwantedNGrams;
+    unwantedWords = response.unwantedWords.filter((w) => w.trim() != "");
+    unwantedNGrams = response.unwantedNGrams.filter((w) => w.trim() != "");
+    if (
+      unwantedWords.length != response.unwantedWords.length ||
+      unwantedNGrams.length != response.unwantedNGrams.length
+    ) {
+      updateSettings();
+    }
     defaultSiteConfig = response.defaultSiteConfig;
     isStealthMode = response.isStealthMode;
 
